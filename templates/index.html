@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Données de Température Globale</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Données de Température Globale</h1>
+    <table id="data-table">
+        <!-- Les données seront insérées ici -->
+    </table>
+
+    <script>
+        function fetchData() {
+            fetch('/fetch_data')
+                .then(response => response.text())
+                .then(csvData => {
+                    const lines = csvData.trim().split('\n');
+                    const table = document.getElementById('data-table');
+                    table.innerHTML = ''; // Réinitialiser le contenu de la table
+
+                    lines.forEach((line, index) => {
+                        const row = document.createElement('tr');
+                        const cells = line.split(',');
+
+                        cells.forEach(cell => {
+                            const cellElement = document.createElement(index === 0 ? 'th' : 'td');
+                            cellElement.textContent = cell.trim();
+                            row.appendChild(cellElement);
+                        });
+
+                        table.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des données:', error);
+                });
+        }
+
+        // Appeler la fonction au chargement de la page
+        fetchData();
+
+        // Actualiser les données toutes les 24 heures (86400000 millisecondes)
+        setInterval(fetchData, 86400000);
+    </script>
+</body>
+</html>
